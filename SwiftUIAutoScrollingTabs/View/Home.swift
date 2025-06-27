@@ -25,11 +25,13 @@ struct Home: View {
                             ProductSectionView(products)
                         }
                     } header: {
-                        ScrollableTabs()
+                        ScrollableTabs(proxy)
                     }
                 }
             }
         }
+        /// For Scroll Content Offset Detection
+        .coordinateSpace(name: "CONTENTVIEW")
         .navigationTitle("Apple Store")
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarBackground(Color(.purple), for: .navigationBar)
@@ -66,6 +68,12 @@ struct Home: View {
             }
         }
         .padding(15)
+        /// - For Auto Scrolling VIA ScrollViewProxy
+        .id(products.type)
+        .offset("CONTENTVIEW") { rect in
+            let minY = rect.minY
+            /// Whene the content reaches it's top then updating the current active Tab
+        }
     }
     
     /// Product Row View
@@ -81,13 +89,27 @@ struct Home: View {
                     RoundedRectangle(cornerRadius: 15, style: .continuous)
                         .fill(Color.white)
                 }
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Text(product.title)
+                    .font(.title3)
+                
+                Text(product.subtitle)
+                    .font(.callout)
+                    .foregroundStyle(Color.gray)
+                
+                Text(product.price)
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color.purple)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     /// Scrollable Tabs
     @ViewBuilder
-    func ScrollableTabs() -> some View {
+    func ScrollableTabs(_ proxy: ScrollViewProxy) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 10) {
                 ForEach(ProductType.allCases, id: \.rawValue) { type in
@@ -110,6 +132,8 @@ struct Home: View {
                         .onTapGesture {
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 activeTab = type
+                                /// Scrolling to the selected content
+                                proxy.scrollTo(type, anchor: .topLeading)
                             }
                         }
                 }
