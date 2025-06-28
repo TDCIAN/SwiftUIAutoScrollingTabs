@@ -13,6 +13,7 @@ struct Home: View {
     @State private var activeTab: ProductType = .iphone
     @Namespace private var animation
     @State private var productsBasedOnType: [[Product]] = []
+    @State private var animationProgress: CGFloat = 0
     
     var body: some View {
         /// For Auto Scrolling Content's
@@ -73,6 +74,14 @@ struct Home: View {
         .offset("CONTENTVIEW") { rect in
             let minY = rect.minY
             /// Whene the content reaches it's top then updating the current active Tab
+            if (minY < 30 && minY < (rect.midY / 2) && activeTab != products.type) && animationProgress == 0 {
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    /// Safety Check
+                    activeTab = (minY < 30 && -minY < (rect.midY / 2) && activeTab != products.type)
+                    ? products.type
+                    : activeTab
+                }
+            }
         }
     }
     
@@ -129,9 +138,12 @@ struct Home: View {
                         })
                         .padding(.horizontal, 15)
                         .contentShape(Rectangle())
+                        /// Scrolling tabs when ever the active tab is updated
+                        .id(type.tabID)
                         .onTapGesture {
                             withAnimation(.easeInOut(duration: 0.3)) {
                                 activeTab = type
+                                animationProgress = 1.0
                                 /// Scrolling to the selected content
                                 proxy.scrollTo(type, anchor: .topLeading)
                             }
@@ -139,6 +151,15 @@ struct Home: View {
                 }
             }
             .padding(.vertical, 15)
+            .onChange(of: activeTab) { oldValue, newValue in
+                withAnimation(.easeInOut(duration: 0.3)) {
+                    proxy.scrollTo(newValue.tabID, anchor: .center)
+                }
+            }
+            .checkAnimationEnd(for: animationProgress) {
+                /// Resetting to default when the animation was finished
+                animationProgress = 0.0
+            }
         }
         .background {
             Rectangle()

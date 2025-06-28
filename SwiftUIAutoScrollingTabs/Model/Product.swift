@@ -23,6 +23,11 @@ enum ProductType: String, CaseIterable {
     case desktop = "Mac Desktop"
     case appleWatch = "Apple Watch"
     case airpods = "Airpods"
+    
+    var tabID: String {
+        /// Creating Another UniqueID for Tab Scrolling
+        return self.rawValue + self.rawValue.prefix(4)
+    }
 }
 
 var products: [Product] = [
@@ -55,6 +60,9 @@ var products: [Product] = [
     Product(type: .desktop, title: "iMac", subtitle: "M1 - Purple", price: "$1599", productImage: "6"),
     
     /// Airpods
+    Product(type: .airpods, title: "Airpods", subtitle: "Pro 2nd Gen", price: "$249", productImage: "7"),
+    Product(type: .airpods, title: "Airpods", subtitle: "3rd Gen", price: "$179", productImage: "8"),
+    Product(type: .airpods, title: "Airpods", subtitle: "2nd Gen", price: "$129", productImage: "9"),
     Product(type: .airpods, title: "Airpods", subtitle: "Pro 2nd Gen", price: "$249", productImage: "7"),
     Product(type: .airpods, title: "Airpods", subtitle: "3rd Gen", price: "$179", productImage: "8"),
     Product(type: .airpods, title: "Airpods", subtitle: "2nd Gen", price: "$129", productImage: "9"),
